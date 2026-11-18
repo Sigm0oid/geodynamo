@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+env:
+  CARGO_TERM_COLOR: always
+  AWS_ACCESS_KEY_ID: test
+  AWS_SECRET_ACCESS_KEY: test
+  AWS_REGION: local
+
+jobs:
+  lint-and-test:
+    name: Clippy, Docs & Tests
+    runs-on: ubuntu-latest
+    services:
+      dynamodb:
+        image: amazon/dynamodb-local:latest
+        ports:
+          - 8000:8000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Run Clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Build documentation
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --no-deps --all-features
+      - name: Run unit tests
+        run: cargo test --lib
+      - name: Wait for DynamoDB Local
+        run: |
+          for i in $(seq 1 30); do
+            if bash -c "</dev/tcp/127.0.0.1/8000" 2>/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "DynamoDB Local failed to start on port 8000" >&2
+          exit 1
+      - name: Run DynamoDB Local integration tests
+        run: cargo test --test integration_dynamodb_local -- --include-ignored

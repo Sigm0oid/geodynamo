@@ -1,0 +1,35 @@
+[package]
+name = "geodynamo"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+authors = ["Hamza Rhibi <elrhibihamzas@gmail.com>"]
+description = "Geospatial indexing, CRUD, radius/bounding-box queries, and cursor pagination for Amazon DynamoDB using Google S2 Geometry and the official AWS SDK for Rust."
+license = "MIT"
+repository = "https://github.com/Sigm0oid/geodynamo"
+homepage = "https://github.com/Sigm0oid/geodynamo"
+documentation = "https://docs.rs/geodynamo"
+readme = "README.md"
+keywords = ["dynamodb", "geospatial", "s2", "geohash", "aws"]
+categories = ["database", "science::geo", "asynchronous"]
+
+[dependencies]
+aws-sdk-dynamodb = "1"
+base64 = "0.22"
+futures = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+
+[dev-dependencies]
+aws-config = { version = "1", features = ["behavior-version-latest"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
+uuid = { version = "1", features = ["v4"] }
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+
+[lints.clippy]
+all = "warn"
+pedantic = "allow"
