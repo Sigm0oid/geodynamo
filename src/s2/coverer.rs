@@ -3,7 +3,7 @@
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 
-use super::cell_id::{S2CellId, MAX_LEVEL};
+use super::cell_id::{S2CellId, Vec3, MAX_LEVEL};
 use super::geometry::{S2Cap, S2LatLng, S2LatLngRect};
 
 /// Approximates geographic regions (`S2LatLngRect` or `S2Cap`) as a compact union of [`S2CellId`]s.
@@ -151,7 +151,7 @@ impl S2RegionCoverer {
     }
 }
 
-fn cell_bounding_cap_angle(corners: &[(f64, f64, f64); 4], center: (f64, f64, f64)) -> f64 {
+fn cell_bounding_cap_angle(corners: &[Vec3; 4], center: Vec3) -> f64 {
     let mut min_dot = 1.0_f64;
     for &(vx, vy, vz) in corners {
         let dot = (center.0 * vx + center.1 * vy + center.2 * vz).clamp(-1.0, 1.0);

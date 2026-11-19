@@ -28,6 +28,9 @@ const POS_TO_IJ: [[i32; 4]; 4] = [
 /// Orientation XOR delta for each Hilbert curve sub-position `0..4`.
 const POS_TO_ORIENTATION: [usize; 4] = [SWAP_MASK, 0, 0, INVERT_MASK | SWAP_MASK];
 
+/// 3D direction / unit vector `(x, y, z)` on the sphere.
+pub(crate) type Vec3 = (f64, f64, f64);
+
 /// A 64-bit S2 cell identifier encoding `(face, hilbert_position, level_sentinel)`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct S2CellId(pub u64);
@@ -166,7 +169,7 @@ impl S2CellId {
     }
 
     /// Returns the 4 corner unit vectors and center unit vector of this S2 cell on the sphere.
-    pub(crate) fn vertices_and_center_xyz(self) -> ([(f64, f64, f64); 4], (f64, f64, f64)) {
+    pub(crate) fn vertices_and_center_xyz(self) -> ([Vec3; 4], Vec3) {
         let (face, i_lo, j_lo, size) = self.to_face_ij_size();
         let i_hi = i_lo + size;
         let j_hi = j_lo + size;

@@ -41,11 +41,17 @@ pub enum GeoError {
     #[error("invalid pagination token: {0}")]
     InvalidPaginationToken(String),
 
-    /// Underlying AWS SDK DynamoDB error.
+    /// Underlying AWS SDK DynamoDB error (boxed to keep `Result<T>` stack size small).
     #[error("DynamoDB SDK error: {0}")]
-    DynamoDb(#[from] aws_sdk_dynamodb::Error),
+    DynamoDb(#[from] Box<aws_sdk_dynamodb::Error>),
 
     /// Underlying AWS SDK builder error when constructing key schemas or requests.
     #[error("DynamoDB request build error: {0}")]
     Build(#[from] aws_sdk_dynamodb::error::BuildError),
+}
+
+impl From<aws_sdk_dynamodb::Error> for GeoError {
+    fn from(err: aws_sdk_dynamodb::Error) -> Self {
+        Self::DynamoDb(Box::new(err))
+    }
 }
